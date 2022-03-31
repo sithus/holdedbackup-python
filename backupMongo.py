@@ -26,7 +26,7 @@ async def respuesta(url, session):
     }
     params = {
         'starttmp': 978307200,
-        'endtmp': 2540997503
+        'endtmp': 1743433609
     }
     # print(url)
     async with session.get(url, headers=headers, params=params) as response:
@@ -37,17 +37,17 @@ async def respuesta(url, session):
 async def getURL(URL, session, db):
     if URL['pag_index'] == 1:
         borrados = await deleteDataMongo(URL['coleccion'], db)
-        print("Elementos borrados localmente de la coleccion " +
+        print("Item deleted from collection " +
               URL['coleccion']+": "+str(borrados))
     elementos = await respuesta(URL['url'], session)
     guardados = await saveDataMongo(URL['coleccion'], elementos, db)
-    print(" Elementos almacenados localmente de la coleccion %(coleccion)s: %(cantidad)d" % ({"coleccion": URL['coleccion'], "cantidad": guardados}))
+    print(" Items saved locally:  %(coleccion)s: %(cantidad)d" % ({"coleccion": URL['coleccion'], "cantidad": guardados}))
     if len(elementos) > 0:
         if (len(elementos) >= 500) and (URL['pagination'] == True):
             URL['pag_index'] = URL['pag_index'] + 1
             # Elimino el parámetro "page" anterior en la recursividad
             URL['url'] = URL['url'].split('?')[0]+"?page=" + str(URL['pag_index'])
-            print('Solicitando página ' + str(URL['pag_index'])+' de la colección '+URL['coleccion'])
+            print('Request for page ' + str(URL['pag_index'])+' de la colección '+URL['coleccion'])
             await getURL(URL, session, db)
 
 
@@ -61,7 +61,7 @@ async def saveDataMongo(coleccion, data, db):
         result = await db[coleccion].insert_many(data)
         return len(result.inserted_ids)
     except:
-        print(' ERROR: al almacenar la colección: '+coleccion)
+        print(' ERROR: Saving collection:  '+coleccion)
         return 0
 
 
@@ -74,11 +74,11 @@ async def conectaDbMongo(loop):
 
 async def backup(loop):
     db = await conectaDbMongo(loop)
-    print("BD conectada.")
+    print("DB connected.")
     async with aiohttp.ClientSession(loop=loop) as session:
         tasks = [getURL(url, session, db) for url in URLs]
         await asyncio.gather(*tasks)
-        print('BD cerrada.')
+        print('DB closed.')
 
 if len(sys.argv) == 3:
     USER_KEY = str(sys.argv[2])
@@ -87,4 +87,4 @@ if len(sys.argv) == 3:
     loop.run_until_complete(backup(loop))
 else:
     print(len(sys.argv))
-    print ("No enough params. Use: backupMongo <mongodbname> <userkey>")
+    print ("No enough params. Use: backupMongo <mongodbname> <userapikey>")
