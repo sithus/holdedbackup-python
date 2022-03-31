@@ -10,7 +10,7 @@ You must to have installed a mongo server locally for using this version.
 
 Use:
 
-backupMongo mongoDatabase holdedUserApiKey
+backupMongo.py mongoDatabase holdedUserApiKey
 
 
 
