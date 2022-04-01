@@ -10,11 +10,11 @@ You must to have installed a mongo server locally for using this version.
 
 ## INSTALLATION
 
-pip3 install asyncio aiohttp motor
+$> pip3 install asyncio aiohttp motor
 
 ## USE
 
-backupMongo.py mongoDatabase holdedUserApiKey
+$> python3 backupMongo.py mongoDatabase holdedUserApiKey
 
 
 
